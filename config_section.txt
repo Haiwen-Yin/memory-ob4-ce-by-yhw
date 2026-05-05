@@ -1,0 +1,42 @@
+## Configuration (Embedding Model Support)
+
+Before using this memory system, configure your embedding model preferences:
+
+```python
+# File: .hermes/config.yaml or skills/memory-ob4-ce-by-yhw/config.py
+MEMORY_EMBEDDING_CONFIG = {
+    # Primary embedding model configuration
+    "model_name": "bge-m3",           # Model identifier
+    "dimensions": 1024,               # Vector dimensions (auto-detected from model)
+    "api_endpoint": "http://localhost:5000/api/embed",  # Embedding API endpoint
+    
+    # Storage type preference (ORDERED by priority)
+    "preferred_storage_types": [
+        {"type": "vector_native", "dimension": 1024, "description": "Native VECTOR(n) - Best performance"},
+        {"type": "json_array", "dimension": None, "description": "JSON fallback for compatibility"},
+        {"type": "text_string", "dimension": None, "description": "TEXT string (legacy)"},
+    ],
+    
+    # Model-specific dimension mapping (auto-detected)
+    "model_dimensions": {
+        "bge-m3": 1024,              # BGE-M3 - High quality, 1024 dimensions
+        "bge-large-en-v1.5": 1024,   # BGE Large English v1.5
+        "text-embedding-ada-002": 1536,  # OpenAI Ada 002 - Best for search
+        "all-MiniLM-L6-v2": 384,     # MiniLM L6 v2 - Lightweight, fast
+        "cogview-embedder": 768,     # CogView embedder (example)
+    },
+    
+    # Auto-detection settings
+    "auto_detect_model": True,       # Automatically detect model from API response
+    "fallback_dimension": 1024,      # Default dimension if detection fails
+    
+    # Model selection hints for Hermes Agent
+    "model_recommendations": {
+        "high_quality_search": "text-embedding-ada-002",  # Best accuracy
+        "balanced_performance": "bge-m3",                 # Good balance
+        "fast_lightweight": "all-MiniLM-L6-v2",          # Fastest, smallest
+    }
+}
+
+# How to use in SKILL.md configuration:
+"""

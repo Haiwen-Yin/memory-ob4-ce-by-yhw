@@ -1,0 +1,162 @@
+### P4: Vector Embedding Storage (Native VECTOR - Recommended)
+
+**CONFIRMED: OceanBase CE v4.5.0 supports native VECTOR type!**
+
+**Tested on:** OceanBase_CE 4.5.0.0 (r100000012025112711-0e8d5ad012baf0953b2032a35a88bdf8886e9a7a)
+**Test Date:** 2026-05-05
+
+---
+
+#### Model-Aware Storage Selection (Auto-Detection)
+
+SKILL supports automatic storage type selection based on configured embedding model:
+
+```python
+class MemoryStorageConfig:
+    """Memory storage configuration with auto-detection by embedding model"""
+    
+    def __init__(self, config: dict):
+        self.config = config
+        self.model_name = config.get("model_name", "bge-m3")
+        self.dimensions = config.get("dimensions", 1024)
+        self.storage_priority = config.get("preferred_storage_types", [])
+        
+    def get_optimal_storage_type(self):
+        """Determine optimal storage type based on model and capabilities"""
+        # Check if native VECTOR is supported for this dimension
+        for storage in self.storage_priority:
+            if storage["type"] == "vector_native" and storage.get("dimension") == self.dimensions:
+                return {
+                    "storage_type": "native_vector",
+                    "table_name": f"memories_vectors_{self.model_name}",
+                    "column_definition": f"VECTOR({self.dimensions})",
+                    "description": f"Native VECTOR({self.dimensions}) - Best for {self.model_name}"
+                }
+        
+        # Fallback to JSON if native VECTOR not available or dimension mismatched
+        return {
+            "storage_type": "json_array",
+            "table_name": "memories_vectors_json",
+            "column_definition": "JSON",
+            "description": f"JSON array - Compatible with all models including {self.model_name}"
+        }
+    
+    def generate_sql_schema(self):
+        """Generate appropriate SQL schema based on storage type"""
+        storage_info = self.get_optimal_storage_type()
+        
+        if storage_info["storage_type"] == "native_vector":
+            return f'''
+CREATE TABLE IF NOT EXISTS {storage_info['table_name']} (
+    memory_id BIGINT NOT NULL,
+    embedding {storage_info['column_definition']},  -- Auto-detected dimension for {self.model_name}
+    model_name VARCHAR(50) DEFAULT '{self.model_name}',
+    dimensions INT DEFAULT {self.dimensions},
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (memory_id)
+);'''
+        else:
+            return f'''
+CREATE TABLE IF NOT EXISTS {storage_info['table_name']} (
+    memory_id BIGINT NOT NULL,
+    embedding JSON NOT NULL,  -- JSON array for {self.model_name} ({self.dimensions} dims)
+    model_name VARCHAR(50) DEFAULT '{self.model_name}',
+    dimensions INT DEFAULT {self.dimensions},
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (memory_id)
+);'''
+
+# Usage example:
+config = MemoryStorageConfig(MEMORY_EMBEDDING_CONFIG)
+schema_sql = config.generate_sql_schema()
+print(f"Generated schema for {config.model_name}:")
+print(schema_sql)
+```
+
+---
+
+#### Model-Aware SQL Schema Generation Examples
+
+**For BGE-M3 (1024 dimensions):**
+```sql
+-- Native VECTOR storage (RECOMMENDED - best performance)
+CREATE TABLE memories_vectors_bge_m3 (
+    memory_id BIGINT NOT NULL,
+    embedding VECTOR(1024),  -- Auto-detected: bge-m3 = 1024 dimensions
+    model_name VARCHAR(50) DEFAULT 'bge-m3',
+    dimensions INT DEFAULT 1024,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (memory_id)
+);
+
+-- Insert with raw vector array (must match VECTOR dimension)
+INSERT INTO memories_vectors_bge_m3 (memory_id, embedding) 
+VALUES (1, '[0.123456, 0.234567, ...]');  -- Exactly 1024 values needed
+```
+
+**For OpenAI Ada-002 (1536 dimensions):**
+```sql
+-- Native VECTOR storage for OpenAI embedding model
+CREATE TABLE memories_vectors_ada002 (
+    memory_id BIGINT NOT NULL,
+    embedding VECTOR(1536),  -- Auto-detected: ada-002 = 1536 dimensions
+    model_name VARCHAR(50) DEFAULT 'text-embedding-ada-002',
+    dimensions INT DEFAULT 1536,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (memory_id)
+);
+```
+
+**For MiniLM-L6-v2 (384 dimensions):**
+```sql
+-- Native VECTOR storage for lightweight model
+CREATE TABLE memories_vectors_minilm (
+    memory_id BIGINT NOT NULL,
+    embedding VECTOR(384),  -- Auto-detected: all-MiniLM-L6-v2 = 384 dimensions
+    model_name VARCHAR(50) DEFAULT 'all-MiniLM-L6-v2',
+    dimensions INT DEFAULT 384,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (memory_id)
+);
+```
+
+---
+
+#### Model Configuration Guide for Users
+
+**Step 1: Choose your embedding model:**
+
+| Use Case | Recommended Model | Dimensions | API Endpoint Example |
+|----------|-------------------|------------|---------------------|
+| High-quality search | text-embedding-ada-002 | 1536 | https://api.openai.com/v1/embeddings |
+| Balanced performance | bge-m3 | 1024 | http://localhost:5000/api/embed |
+| Fast/lightweight | all-MiniLM-L6-v2 | 384 | http://localhost:5000/api/embed |
+
+**Step 2: Configure in SKILL settings:**
+
+```yaml
+# .hermes/skills/memory-ob4-ce-by-yhw/config.yaml
+embedding_model: bge-m3
+vector_dimensions: 1024
+storage_preference: native_vector  # or json_array for compatibility
+api_endpoint: http://localhost:5000/api/embed
+```
+
+**Step 3: SKILL auto-detects and creates appropriate schema:**
+
+```python
+# SKILL automatically generates optimal schema based on config
+from memory_storage_config import MemoryStorageConfig
+
+config = MemoryStorageConfig.load_from_yaml("config.yaml")
+schema = config.generate_sql_schema()
+
+# Output for bge-m3: CREATE TABLE memories_vectors_bge_m3 (embedding VECTOR(1024), ...)
+```
+
+---
+
+**Application-layer vector operations work regardless of storage format:**
+- Cosine similarity calculation in Python/Go
+- Approximate nearest neighbor search via application logic
+- Dimensionality reduction if needed

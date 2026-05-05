@@ -23,12 +23,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Structured JSON views for API-friendly data consumption
 - Memory decomposition tables replacing Oracle AI DB native features
 
-### Testing Status (v0.1.0)
-- Schema DDL syntax verified on SQLcl
-- Basic query format checked for SQL views
-- Graph traversal patterns documented but not tested with real data
-- Vector search requires OceanBase deployment for validation
-- Full-text indexing support varies by OceanBase CE version
+## [0.1.1] - 2026-05-05 (Task Plan Support)
+
+### Added
+- **Task Plan System** — Complete task management framework for AI Agents
+  - `task_plans` table with status tracking (PENDING/RUNNING/SUCCESS/FAILED/CANCELLED/PAUSED)
+  - `task_steps` table for step-by-step execution tracking
+  - `task_context_snapshots` table for breakpoint recovery after failures
+  - `task_tool_calls` audit trail table for all tool executions
+  - `task_dependencies` table with HARD/SOFT/EXCLUSIVE dependency types
+- **Task Plan Python API** (`scripts/task_plan_api.py`) — High-level interface:
+  - `create_task_plan()` — Create task with goal, steps, and metadata
+  - `resume_task()` — Restore execution from latest context snapshot
+  - `search_completed_tasks()` — Search historical tasks for pattern learning
+- **Task Plan SQL Schema** (`scripts/init_task_plan_system.sql`) — OceanBase CE compatible DDL
+
+### Features
+- **Breakpoint Recovery**: Automatic context snapshots enable resuming from any point after failure
+- **Historical Learning**: Search completed tasks to reuse successful patterns across projects
+- **Tool Call Auditing**: Full record of all tool executions with duration and result size tracking
+- **Task Dependencies**: Define relationships between plans (HARD/SOFT/EXCLUSIVE/RECOMMENDED)
+
+### Updated
+- SKILL.md: Added Task Plan documentation and API usage examples
+- All scripts updated to reference v0.1.1 versioning
 
 ## [0.1.0] - 2026-05-01 (PRELIMINARY RESEARCH VERSION)
 
@@ -51,19 +69,3 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Vector search performance needs benchmarking
 - Graph traversal scalability under heavy load untested
 
-## Planned Changes (v0.2.0)
-
-### To Be Implemented
-1. Deploy on standalone OceanBase CE instance and validate all DDL statements
-2. Test vector similarity calculation with real embedding data
-3. Benchmark graph traversal performance with realistic node/edge counts
-4. Validate full-text search availability across supported CE versions
-5. Add comprehensive SQL test cases for each major query pattern
-6. Create automated testing framework for CI/CD integration
-
-### To Be Optimized
-1. JSON view query optimization and profiling
-2. Memory decomposition table indexing strategy validation
-3. Application-layer vector storage format standardization
-4. Graph traversal algorithm improvements for large datasets
-5. Full-text search tokenization strategies for Chinese text

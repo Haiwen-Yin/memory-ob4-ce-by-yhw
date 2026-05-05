@@ -4,7 +4,7 @@ This directory contains external references and documentation for the OceanBase 
 
 ## OceanBase Documentation
 
-- [OceanCE Community Edition Download](https://www.oceanbase.com/software-download/community)
+- [OceanCE Community Edition Download](https://www.oceanbase.com/softwarecenter)
   - Official download page for OceanBase Community Edition 4.x
   - Includes installation packages for Linux, macOS, and Windows
   
