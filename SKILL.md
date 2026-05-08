@@ -1,14 +1,14 @@
 ---
 name: memory-ob4-ce-by-yhw
-version: v0.1.1 (OceanBase Community Edition 4.x)
+version: v0.1.2 (OceanBase Community Edition 4.x)
 author: Haiwen Yin (胖头鱼 🐟)
 description: OceanBase CE 4.x Memory System - Universal memory system for AI Agents with Property Graph via recursive CTEs, vector similarity search via application layer, full-text search capabilities on OceanBase Community Edition, Task Plan management for persistent task execution. Includes Performance Optimizations (composite indexes, LRU cache, batch operations).
 ---
 
-# OceanBase Community Edition 4.x Memory System v0.1.1
+# OceanBase Community Edition 4.x Memory System v0.1.2
 
 **Author**: Haiwen Yin (胖头鱼 🐟)  
-**Version**: v0.1.1 (OceanBase CE 4.x + Task Plan Support + Performance Optimizations) - 2026-05-05  
+**Version**: v0.1.2 (OceanBase CE 4.x + Task Plan Support + Performance Optimizations) - 2026-05-05  
 **Status**: ⚠️ PRELIMINARY RESEARCH VERSION — Tested on OceanBase CE v4.5.0  
 **License**: Apache License 2.0
 
@@ -62,10 +62,10 @@ MEMORY_EMBEDDING_CONFIG = {
 }
 
 # How to use in SKILL.md configuration:
-"""## ✨ Core Features (v0.1.1 - with Performance Optimizations)
+"""## ✨ Core Features (v0.1.2 - with Performance Optimizations)
 ---
 
-## ⚡ Performance Optimizations (v0.1.1)
+## ⚡ Performance Optimizations (v0.1.2)
 
 ### P1: Composite Indexes for Query Performance (+30-50% query speed)
 
@@ -970,17 +970,17 @@ CREATE INDEX idx_relationships_type ON memory_relationships(relationship_type);
 │                    OceanBase CE 4.x Database Layer          │
 │                                                             │
 │  ┌──────────────────┐    ┌──────────────────┐               │
-│  │   memory_nodes   │    │  memories_vectors│               │
-│  │   (TEXT vectors) │    │   (TEXT vectors) │               │
+│  │   memory_nodes   │    │ memories_vectors │               │
+│  │   (TEXT vectors) │    │  (TEXT vectors)  │               │
 │  └──────────────────┘    └──────────────────┘               │
 │           ▲                       ▲                         │
 │  ┌──────────────────┐    ┌──────────────────┐               │
-│  │   memory_edges   │    │     memories     │               │
-│  │   (graph edges)  │    │   (TEXT content) │               │
+│  │   memory_edges   │    │    memories      │               │
+│  │   (graph edges)  │    │  (TEXT content)  │               │
 │  └──────────────────┘    └──────────────────┘               │
 │           ▲                       ▲                         │
 │  ┌─────────────────────────────────────────────────────┐    │
-│  │       Decomposition Tables (JSON-like structure)    │    │
+│  │      Decomposition Tables (JSON-like structure)     │    │
 │  │  memory_node_properties | memory_edge_properties    │    │
 │  │  memory_content_fields | memory_tag_items           │    │
 │  │  memory_metadata_fields | memory_relationships      │    │
@@ -1054,7 +1054,7 @@ def find_similar_nodes(target_embedding: list[float], threshold=0.7):
     return similar_nodes[:10]  # Return top 10 results
 ```
 
-### Vector Storage Format (v0.1.1 - Native VECTOR Recommended)
+### Vector Storage Format (v0.1.2 - Native VECTOR Recommended)
 
 **Verified on OceanBase CE v4.5.0:**
 - ✅ Native VECTOR(768) type supported
@@ -1244,7 +1244,7 @@ FROM memory_nodes n;
 
 ---
 
-## 📊 Indexing Strategy for OceanBase CE 4.x (v0.1.1: Enhanced with Composite Indexes)
+## 📊 Indexing Strategy for OceanBase CE 4.x (v0.1.2: Enhanced with Composite Indexes)
 
 ### Recommended Indexes
 
@@ -1410,7 +1410,7 @@ Failed: ❌ 0
 
 ---
 
-### v0.1.1 — Task Plan Support (2026-05-05)
+### v0.1.2 — Task Plan Support (2026-05-05)
 
 ⚠️ **IMPORTANT: This is a PRELIMINARY RESEARCH VERSION**
 
@@ -1453,7 +1453,7 @@ This version represents initial architectural exploration and design validation 
 
 ---
 
-## 📋 v0.1.1 Task Plan System (NEW)
+## 📋 v0.1.2 Task Plan System (NEW)
 
 ### Quick Start with Task Plans
 
@@ -1491,7 +1491,7 @@ completed = search_completed_tasks({"status": "SUCCESS", "type": "deployment"})
 - **SQL Initialization**: `scripts/init_task_plan_system.sql` — Creates 5 Task Plan tables with indexes
 - **API Implementation**: `scripts/task_plan_api.py` — Python API for task management
 
-### Task Plan Tables (v0.1.1)
+### Task Plan Tables (v0.1.2)
 
 | Table | Purpose | Key Columns |
 |-------|---------|-------------|

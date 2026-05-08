@@ -69,3 +69,37 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Vector search performance needs benchmarking
 - Graph traversal scalability under heavy load untested
 
+
+---
+
+## [v0.1.2] - 2026-05-07 (Multi-Agent Architecture Edition)
+
+### Added
+- **Multi-Agent Architecture**: Complete framework for managing multiple coordinated AI agents
+- **Agent Registry System** - Centralized agent lifecycle management with registration, capability discovery, and health monitoring
+- **Memory Access Control** - Fine-grained visibility policies (SHARED/PRIVATE/COLLABORATIVE) per agent
+- **Collaboration Framework** - Built-in communication channels for agent-to-agent coordination
+- **Session Management** - Active session tracking with state persistence
+
+### Database Schema Added:
+- `agent_registry` - Agent lifecycle management table
+- `agent_memory_access` - Memory access control policies  
+- `agent_collaboration` - Inter-agent communication records
+- `agent_session` - Session tracking and monitoring
+- Views: `v_active_sessions`, `v_collaboration_status`
+
+### Python API Added:
+- `AgentRegistryAPI` - Agent registration and discovery
+- `MemoryVisibilityAPI` - Access policy management
+- `CollaborationAPI` - Inter-agent messaging
+- `AgentSessionAPI` - Session lifecycle management
+
+### Files Added:
+- `scripts/init_multi_agent_schema.sql` - Multi-Agent DDL schema with views and seed data
+- `scripts/agent_api.py` - Python API for multi-agent coordination (18.5 KB)
+- `RELEASE_NOTES_v0.1.2.md` - Detailed release notes
+
+### Updated:
+- SKILL.md - Added v0.1.2 Multi-Agent documentation, feature comparison table
+- README.md - Complete rewrite with v0.1.2 Multi-Agent Architecture edition
+- VERSION file - Updated to v0.1.2
